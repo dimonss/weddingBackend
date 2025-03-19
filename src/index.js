@@ -33,10 +33,12 @@ const startApp = async () => {
         const uuid = req?.params?.uuid;
         GuestSQL.find(uuid, (error, item) => {
             if (error) {
-                res.json(commonDto(STATUS.NOT_FOUND, 'user not found'));
+                res.json(commonDto(STATUS.ERROR, 'error'));
                 return;
             }
-            res.json(commonDto(STATUS.OK, 'success', item));
+            if (item) {
+                res.json(commonDto(STATUS.OK, 'success', item));
+            } else res.json(commonDto(STATUS.NOT_FOUND, 'user not found'));
         });
     });
     app.post('/guest_approve/:uuid', (req, res) => {
@@ -44,7 +46,7 @@ const startApp = async () => {
         const respDate = getCurrentDate();
         GuestSQL.updateStatus({ uuid, respStatus: true, respDate }, (error, person) => {
             if (error) {
-                res.json(commonDto(STATUS.NOT_FOUND, 'user not found'));
+                res.json(commonDto(STATUS.ERROR, 'error'));
                 return;
             }
             res.json(commonDto(STATUS.OK, 'success', person));
@@ -55,7 +57,7 @@ const startApp = async () => {
         const respDate = getCurrentDate();
         GuestSQL.updateStatus({ uuid, respStatus: false, respDate }, (error, person) => {
             if (error) {
-                res.json(commonDto(STATUS.NOT_FOUND, 'user not found'));
+                res.json(commonDto(STATUS.ERROR, 'error'));
                 return;
             }
             res.json(commonDto(STATUS.OK, 'success', person));
