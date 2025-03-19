@@ -31,7 +31,6 @@ const startApp = async () => {
 
     app.get('/guest/:uuid', (req, res) => {
         const uuid = req?.params?.uuid;
-        console.log(uuid);
         GuestSQL.find(uuid, (error, item) => {
             if (error) {
                 res.json(commonDto(STATUS.NOT_FOUND, 'user not found'));
@@ -42,26 +41,24 @@ const startApp = async () => {
     });
     app.post('/guest_approve/:uuid', (req, res) => {
         const uuid = req?.params?.uuid;
-        console.log(uuid);
         const respDate = getCurrentDate();
-        GuestSQL.updateStatus({ uuid, respStatus: true, respDate }, (error, product) => {
+        GuestSQL.updateStatus({ uuid, respStatus: true, respDate }, (error, person) => {
             if (error) {
                 res.json(commonDto(STATUS.NOT_FOUND, 'user not found'));
                 return;
             }
-            res.json(commonDto(STATUS.OK, 'success', product));
+            res.json(commonDto(STATUS.OK, 'success', person));
         });
     });
     app.post('/guest_reject/:uuid', (req, res) => {
         const uuid = req?.params?.uuid;
-        console.log(uuid);
         const respDate = getCurrentDate();
-        GuestSQL.updateStatus({ uuid, respStatus: false, respDate }, (error, product) => {
+        GuestSQL.updateStatus({ uuid, respStatus: false, respDate }, (error, person) => {
             if (error) {
                 res.json(commonDto(STATUS.NOT_FOUND, 'user not found'));
                 return;
             }
-            res.json(commonDto(STATUS.OK, 'success', product));
+            res.json(commonDto(STATUS.OK, 'success', person));
         });
     });
 };
