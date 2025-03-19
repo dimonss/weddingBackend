@@ -1,0 +1,52 @@
+{
+  "name": "wedding_backend",
+  "version": "1.0.0",
+  "description": "backend for wedding invitation",
+  "main": "src/index.js",
+  "type": "module",
+  "compilerOptions": {
+    "esModuleInterop": true
+  },
+  "engines": {
+    "node": "20.*"
+  },
+  "scripts": {
+    "start:dev": "nodemon src/index.js",
+    "start:prod": "pm2 start src/index.js --name WeddingBackend",
+    "build": "rimraf ./build && npx tsc",
+    "start": "npm run build && node build/main",
+    "lint": "npx eslint ./src",
+    "format": "npx eslint ./src --fix"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dimonss/GoldQuotesBalanceDevTeam.git"
+  },
+  "keywords": [
+    "Bot",
+    "gold",
+    "quotes",
+    "dev",
+    "team"
+  ],
+  "author": "DiCh",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/dimonss/wedding_backend/issues"
+  },
+  "homepage": "https://github.com/dimonss/GoldQuotesBalanceDevTeam#readme",
+  "dependencies": {
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "request": "^2.88.2",
+    "sqlite3": "^5.1.6"
+  },
+  "devDependencies": {
+    "eslint": "^8.47.0",
+    "husky": "^8.0.3",
+    "nodemon": "^3.0.1",
+    "prettier": "^3.0.2",
+    "rimraf": "^5.0.1",
+    "typescript": "^5.1.6"
+  }
+}
