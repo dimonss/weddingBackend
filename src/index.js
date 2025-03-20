@@ -41,7 +41,7 @@ const startApp = async () => {
             } else res.json(commonDto(STATUS.NOT_FOUND, 'user not found'));
         });
     });
-    app.post('/guest_approve/:uuid', (req, res) => {
+    app.post('/guest_accept/:uuid', (req, res) => {
         const uuid = req?.params?.uuid;
         const respDate = getCurrentDate();
         GuestSQL.updateStatus({ uuid, respStatus: true, respDate }, (error, person) => {

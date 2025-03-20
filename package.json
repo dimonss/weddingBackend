@@ -20,21 +20,19 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/dimonss/GoldQuotesBalanceDevTeam.git"
+    "url": "https://github.com/dimonss/weddingBackend.git"
   },
   "keywords": [
-    "Bot",
-    "gold",
-    "quotes",
-    "dev",
-    "team"
+    "wedding",
+    "api",
+    "list"
   ],
   "author": "DiCh",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/dimonss/wedding_backend/issues"
   },
-  "homepage": "https://github.com/dimonss/GoldQuotesBalanceDevTeam#readme",
+  "homepage": "https://github.com/dimonss/weddingBackend#readme",
   "dependencies": {
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
