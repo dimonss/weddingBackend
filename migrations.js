@@ -15,7 +15,7 @@ const SQLQueries = {
     uuid TEXT NOT NULL UNIQUE,
     fullName TEXT NOT NULL UNIQUE,
     respDate TEXT,
-    respStatus TEXT,
+    respStatus INTEGER DEFAULT NULL,
     inviter TEXT NOT NULL DEFAULT ${INVITER.DIMA}
     )
     `,

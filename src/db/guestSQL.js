@@ -1,16 +1,40 @@
 import sqlite3 from 'sqlite3';
 
+// Enable verbose mode for detailed error messages during development
 sqlite3.verbose();
-const dbName = 'db.sqlite';
-const chats = new sqlite3.Database(dbName);
 
+// Database configuration
+const DB_NAME = 'db.sqlite';
+const db = new sqlite3.Database(DB_NAME);
+
+/**
+ * Class responsible for guest-related database operations
+ */
 class GuestSQL {
-    static find(uuid, cb) {
-        chats.get('SELECT * FROM guest WHERE uuid = ?', uuid, cb);
+    /**
+     * Find a guest by UUID
+     *
+     * @param {string} uuid - The unique identifier of the guest
+     * @param {Function} callback - Callback function(error, row)
+     */
+    static find(uuid, callback) {
+        const query = 'SELECT * FROM guest WHERE uuid = ?';
+        db.get(query, [uuid], callback);
     }
-    static updateStatus(data, cb) {
-        const sql = 'UPDATE guest SET respStatus = ?, respDate = ? WHERE uuid = ?';
-        chats.run(sql, data.respStatus, data.respDate, data.uuid, cb);
+
+    /**
+     * Update guest response status
+     *
+     * @param {Object} data - The data to update
+     * @param {string} data.uuid - Guest UUID
+     * @param {number} data.respStatus - Response status (accept/reject)
+     * @param {string} data.respDate - Response date
+     * @param {Function} callback - Callback function(error, result)
+     */
+    static updateStatus(data, callback) {
+        const { uuid, respStatus, respDate } = data;
+        const query = 'UPDATE guest SET respStatus = ?, respDate = ? WHERE uuid = ?';
+        db.run(query, [respStatus, respDate, uuid], callback);
     }
 }
 

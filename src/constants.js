@@ -1,3 +1,6 @@
+/**
+ * Application status codes
+ */
 export const STATUS = {
     OK: 'OK',
     ERROR: 'ERROR',
