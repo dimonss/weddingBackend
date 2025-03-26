@@ -1,100 +1,117 @@
-# Guest List API
+# Wedding Guest Management API
 
-## 📌 Описание
-Это простое Node.js приложение для управления списком гостей. Оно использует SQLite в качестве базы данных и позволяет получать информацию о гостях по их UUID.
+## 📌 Description
+A modern Node.js API for managing wedding guest invitations. This application provides endpoints for guests to view their invitation details and respond with acceptance or rejection.
 
-## 🚀 Функционал
-- Добавление гостей в базу данных
-- Получение информации о госте по UUID
-- Обновление статуса присутствия гостя
-- Удаление гостя из списка
+## 🚀 Features
+- RESTful API for guest management
+- Guest lookup by UUID
+- RSVP functionality (accept/reject)
+- Pagination for guest list retrieval
+- Comprehensive error handling
+- Input validation
 
-## 🛠️ Установка и запуск
+## 🛠️ Technology Stack
+- **Node.js** with **Express.js** - Backend framework
+- **Sequelize ORM** - Database operations
+- **SQLite** - Database storage
+- **dotenv** - Environment configuration
 
-### 1. Клонируйте репозиторий:
+## 💻 Installation and Setup
+
+### Prerequisites
+- Node.js (v18 or higher)
+- npm (v7 or higher)
+
+### 1. Clone the repository:
 ```sh
 git clone https://github.com/dimonss/wedding_backend.git
 cd wedding_backend
 ```
 
-### 2. Установите зависимости:
+### 2. Install dependencies:
 ```sh
 npm install
 ```
 
-### 3. Запустите сервер:
+### 3. Set up environment variables:
+Create a `.env` file in the project root with:
+```
+HOSTNAME=localhost
+PORT=4000
+NODE_ENV=development
+```
+
+### 4. Run migrations to set up the database:
 ```sh
-npm start
+node migrations.js
 ```
 
-Сервер запустится на `http://localhost:3000`
-
-## 📡 API Эндпоинты
-
-### 🔍 Получить информацию о госте по UUID
-**GET** `/guests/:uuid`
-
-#### Пример запроса:
+### 5. Start the server:
 ```sh
-curl -X GET http://localhost:3000/guests/123e4567-e89b-12d3-a456-426614174000
+# Development mode
+npm run start:dev
+
+# Production mode
+npm run start:prod
 ```
 
-#### Пример ответа:
-```json
-{
-  "uuid": "123e4567-e89b-12d3-a456-426614174000",
-  "name": "Иван Иванов",
-  "status": "confirmed"
-}
-```
+The server will start at `http://localhost:4000` (or the port specified in your .env file).
 
-### ➕ Добавить гостя
-**POST** `/guests`
+## 📡 API Endpoints
 
-#### Пример запроса:
-```sh
-curl -X POST http://localhost:3000/guests -H "Content-Type: application/json" -d '{
-  "name": "Иван Иванов",
-  "status": "pending"
-}'
-```
+### Health Check
+- **GET** `/health` - Check if the API is running
 
-#### Пример ответа:
-```json
-{
-  "uuid": "123e4567-e89b-12d3-a456-426614174000",
-  "name": "Иван Иванов",
-  "status": "pending"
-}
-```
+### Guest Information
+- **GET** `/guest/:uuid` - Get a specific guest by UUID
+- **GET** `/guests` - Get all guests with pagination
+  - Query parameters: `page` (default: 1), `limit` (default: 10)
 
-### 🔄 Обновить статус гостя
-**PATCH** `/guests/:uuid`
+### RSVP Management
+- **POST** `/guest_accept/:uuid` - Accept an invitation
+- **POST** `/guest_reject/:uuid` - Reject an invitation
 
-#### Пример запроса:
-```sh
-curl -X PATCH http://localhost:3000/guests/123e4567-e89b-12d3-a456-426614174000 -H "Content-Type: application/json" -d '{"status": "confirmed"}'
-```
-
-## 📦 Структура проекта
+## 📦 Project Structure
 ```
 /wedding_backend
-│── /routes        # Маршруты API
-│── /models        # Модели данных
-│── server.js      # Главный файл сервера
-│── db.sqlite3    # База данных SQLite
-│── package.json   # Зависимости проекта
-│── README.md      # Документация
+│── /src                    # Source code
+│   │── /db                 # Database related files
+│   │   │── /models         # Data models
+│   │   │   └── guest.js    # Guest model
+│   │   │── sequelize.js    # Database connection
+│   │   └── guestService.js # Guest service layer
+│   │── /DTO               # Data Transfer Objects
+│   │   └── common.js      # Response DTO
+│   │── /utils             # Utility functions
+│   │   └── commonUtils.js # Common utilities
+│   │── constants.js       # Application constants
+│   └── index.js           # Application entry point
+│── migrations.js          # Database migrations
+│── .env                   # Environment variables
+│── package.json           # Project dependencies
+└── README.md             # Project documentation
 ```
 
-## 🏗️ Технологии
-- **Node.js** (Express.js)
-- **SQLite** (better-sqlite3)
-- **UUID** (для генерации уникальных идентификаторов гостей)
+## 🚀 Development
 
-## 📌 Лицензия
+### Run in development mode with hot-reload:
+```sh
+npm run start:dev
+```
+
+### Linting
+```sh
+npm run lint
+```
+
+### Formatting
+```sh
+npm run format
+```
+
+## 📝 License
 MIT
 
 ---
-Автор: Chalysh Dmitrii
-
+Author: Chalysh Dmitrii
