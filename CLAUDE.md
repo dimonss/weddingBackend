@@ -23,4 +23,12 @@
   - SQL operations in dedicated files
   - Utility functions and constants separated
 
+## Rules
+- Always create SQL queries in guestSQL.js, not in service files
+- Use the DTO classes for all API responses
+- Add meaningful comments for complex business logic
+- Use async/await pattern for database operations
+- Follow MVC pattern with controllers, services, and data layers
+- Keep functions small and focused on a single responsibility
+
 Always run `npm run lint` and `npm run format` before committing changes.

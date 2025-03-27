@@ -9,7 +9,35 @@ dotenv.config();
 
 const HOSTNAME = process.env.HOSTNAME || '0.0.0.0';
 const PORT = process.env.PORT || 7000;
+const ADMIN_USERNAME = process.env.ADMIN_USERNAME || 'defaultUsername';
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'defaultPass';
 const app = express();
+
+/**
+ * Basic authentication middleware
+ *
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ * @param {Function} next - Express next function
+ */
+const basicAuth = (req, res, next) => {
+    // Check for authorization header
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader || !authHeader.startsWith('Basic ')) {
+        res.set('WWW-Authenticate', 'Basic realm="Wedding Admin"');
+        return res.status(401).json(commonDto(STATUS.ERROR, 'Authentication required'));
+    }
+
+    // Decode credentials
+    const base64Credentials = authHeader.split(' ')[1];
+    const credentials = Buffer.from(base64Credentials, 'base64').toString('utf8');
+    const [username, password] = credentials.split(':');
+
+    // Validate credentials
+    if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) next();
+    else return res.status(401).json(commonDto(STATUS.ERROR, 'Invalid credentials'));
+};
 
 /**
  * Setup middleware functions
@@ -40,6 +68,18 @@ const setupRoutes = () => {
     // Health check route
     app.get('/health', (req, res) => {
         res.json(commonDto(STATUS.OK, 'success', { status: 'UP' }));
+    });
+
+    // Get all guests (protected with basic auth)
+    app.get('/guests', basicAuth, (req, res) => {
+        GuestSQL.findAll((error, guests) => {
+            if (error) {
+                console.error('Error fetching guests:', error);
+                res.json(commonDto(STATUS.ERROR, 'Failed to fetch guests'));
+                return;
+            }
+            res.json(commonDto(STATUS.OK, 'success', guests));
+        });
     });
 
     // Get a guest by UUID

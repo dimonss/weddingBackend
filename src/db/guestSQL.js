@@ -23,6 +23,16 @@ class GuestSQL {
     }
 
     /**
+     * Get all guests
+     *
+     * @param {Function} callback - Callback function(error, rows)
+     */
+    static findAll(callback) {
+        const query = 'SELECT * FROM guest ORDER BY fullName';
+        db.all(query, [], callback);
+    }
+
+    /**
      * Update guest response status
      *
      * @param {Object} data - The data to update
