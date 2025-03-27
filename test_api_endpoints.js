@@ -11,7 +11,7 @@ async function testHealthEndpoint() {
         const response = await fetch(`${API_URL}/health`);
         const data = await response.json();
 
-        if (response.ok && data.status === 'UP') {
+        if (response.ok && data?.data?.status === 'UP') {
             console.log('✅ Health check passed');
             return true;
         } else {

@@ -15,6 +15,7 @@
     "start:prod": "pm2 start src/index.js --name WeddingBackend",
     "build": "rimraf ./build && npx tsc",
     "start": "npm run build && node build/main",
+    "test": "node test_api_endpoints.js",
     "lint": "npx eslint ./src",
     "format": "npx eslint ./src --fix"
   },

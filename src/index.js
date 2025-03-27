@@ -39,7 +39,7 @@ const setupMiddleware = () => {
 const setupRoutes = () => {
     // Health check route
     app.get('/health', (req, res) => {
-        res.json({ status: 'UP' });
+        res.json(commonDto(STATUS.OK, 'success', { status: 'UP' }));
     });
 
     // Get a guest by UUID
