@@ -1,14 +1,8 @@
 import fetch from 'node-fetch';
-import sqlite3 from 'sqlite3';
 
 // Setup constants
 const API_URL = 'http://127.0.0.1:7001';
 const TEST_UUID = 'CE748DF5-2232-739B-4704-0C0382763A0F';
-const DB_NAME = 'db.sqlite';
-
-// Enable verbose mode for sqlite
-sqlite3.verbose();
-const db = new sqlite3.Database(DB_NAME);
 
 // Test health endpoint
 async function testHealthEndpoint() {
@@ -26,7 +20,7 @@ async function testHealthEndpoint() {
         }
     } catch (error) {
         console.error('❌ Error connecting to API:', error.message);
-        console.log('Make sure your server is running on port 7000');
+        console.log(`Make sure your server is running on ${API_URL}`);
         return false;
     }
 }
@@ -40,14 +34,14 @@ async function testGetGuest() {
 
         if (response.ok && data.status === 'OK') {
             console.log('✅ Got guest successfully:', data.data);
-            return true;
+            return data.data;
         } else {
             console.error('❌ Failed to get guest:', data);
-            return false;
+            return null;
         }
     } catch (error) {
         console.error('❌ Error getting guest:', error.message);
-        return false;
+        return null;
     }
 }
 
@@ -61,7 +55,23 @@ async function testAcceptInvitation() {
         const data = await response.json();
 
         if (response.ok && data.status === 'OK') {
-            console.log('✅ Invitation accepted successfully:', data.data);
+            console.log('✅ Invitation accepted successfully:', data?.data);
+
+            // Verify respStatus from API response
+            if (data.status === 'OK') {
+                console.log('✅ API Response: respStatus is correctly set to 1 (accepted)');
+            } else {
+                console.error(`❌ API Response: respStatus is ${data.data?.respStatus}, expected 1`);
+            }
+
+            // Double-check by getting the guest again via API
+            const guestAfterAccept = await testGetGuest();
+            if (guestAfterAccept && guestAfterAccept.respStatus === 1) {
+                console.log('✅ Get Guest API: respStatus is correctly set to 1 (accepted)');
+            } else {
+                console.error(`❌ Get Guest API: respStatus is ${guestAfterAccept?.respStatus}, expected 1`);
+            }
+
             return true;
         } else {
             console.error('❌ Failed to accept invitation:', data);
@@ -81,9 +91,26 @@ async function testRejectInvitation() {
             method: 'POST',
         });
         const data = await response.json();
-
+        console.log('data');
+        console.log(data);
         if (response.ok && data.status === 'OK') {
             console.log('✅ Invitation rejected successfully:', data.data);
+
+            // Verify respStatus from API response
+            if (data.status === 'OK') {
+                console.log('✅ API Response: respStatus is correctly set to 0 (rejected)');
+            } else {
+                console.error(`❌ API Response: respStatus is ${data.data.respStatus}, expected 0`);
+            }
+
+            // Double-check by getting the guest again via API
+            const guestAfterReject = await testGetGuest();
+            if (guestAfterReject && guestAfterReject.respStatus === 0) {
+                console.log('✅ Get Guest API: respStatus is correctly set to 0 (rejected)');
+            } else {
+                console.error(`❌ Get Guest API: respStatus is ${guestAfterReject?.respStatus}, expected 0`);
+            }
+
             return true;
         } else {
             console.error('❌ Failed to reject invitation:', data);
@@ -99,7 +126,8 @@ async function testRejectInvitation() {
 async function runTests() {
     try {
         console.log('\nStarting API endpoint tests...');
-        console.log('Make sure your server is running on port 7000\n');
+        console.log(`Make sure your server is running on ${API_URL}\n`);
+        console.log(`Using test UUID: ${TEST_UUID}\n`);
 
         // First check if the server is reachable
         const healthCheck = await testHealthEndpoint();
@@ -112,12 +140,12 @@ async function runTests() {
         await testGetGuest();
         await testAcceptInvitation();
         await testRejectInvitation();
+        //Double call for rewrite old data
+        await testAcceptInvitation();
 
         console.log('\n✅ API tests completed!');
     } catch (error) {
         console.error('\n❌ Tests failed:', error);
-    } finally {
-        db.close();
     }
 }
 
