@@ -16,5 +16,4 @@ npm-debug.log*
 dbTest.sqlite
 *.sql
 *.sqlite
-
-insertData.js
+*.xlsx

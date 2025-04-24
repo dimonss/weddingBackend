@@ -1,9 +1,9 @@
 import sqlite3 from 'sqlite3';
 
 export const DB_NAME = 'db.sqlite';
-export const INVITER = {
-    DIMA: 'Dima',
-    KATE: 'Kate',
+export const GENDER = {
+    MALE: 'male',
+    FEMALE: 'female',
 };
 
 const SQLQueries = {
@@ -16,7 +16,7 @@ const SQLQueries = {
     fullName TEXT NOT NULL UNIQUE,
     respDate TEXT,
     respStatus INTEGER DEFAULT NULL,
-    inviter TEXT NOT NULL DEFAULT ${INVITER.DIMA}
+    gender TEXT NOT NULL DEFAULT ${GENDER.MALE}
     )
     `,
 };

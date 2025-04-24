@@ -10,20 +10,23 @@ const worksheet = workbook.Sheets[workbook.SheetNames[0]];
 
 // Convert to JSON
 const data = xlsx.utils.sheet_to_json(worksheet, {
-    header: ['uuid', 'fullName'],
+    header: ['uuid', 'fullName', 'gender'],
     range: 1, // Skip header row
 });
 
 // Insert data into database
 data.forEach((item) => {
-    if (item.uuid && item.fullName) {
-        db.run(`INSERT INTO guest (uuid, fullName) VALUES ("${item.uuid}", "${item.fullName}")`, (err) => {
-            if (err) {
-                console.log('\x1b[31m', `ERROR ${err.message} - ${item.fullName}`);
-            } else {
-                console.log('\x1b[32m', `SUCCESS ADD ${item.fullName}`);
-            }
-        });
+    if (item.uuid && item.fullName && item.gender) {
+        db.run(
+            `INSERT INTO guest (uuid, fullName, gender) VALUES ("${item.uuid}", "${item.fullName}", "${item.gender}")`,
+            (err) => {
+                if (err) {
+                    console.log('\x1b[31m', `ERROR ${err.message} - ${item.fullName}`);
+                } else {
+                    console.log('\x1b[32m', `SUCCESS ADD ${item.fullName}`);
+                }
+            },
+        );
     }
 });
 
