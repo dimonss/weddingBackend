@@ -1,4 +1,5 @@
 import sqlite3 from 'sqlite3';
+import { v4 as uuidv4 } from 'uuid';
 
 // Enable verbose mode for detailed error messages during development
 sqlite3.verbose();
@@ -11,6 +12,28 @@ const db = new sqlite3.Database(DB_NAME);
  * Class responsible for guest-related database operations
  */
 class GuestSQL {
+    /**
+     * Create a new guest
+     *
+     * @param {Object} guest - Guest data
+     * @param {string} guest.fullName - Guest's full name
+     * @param {string} guest.gender - Guest's gender
+     * @param {Function} callback - Callback function(error, result)
+     */
+    static create(guest, callback) {
+        const { fullName, gender } = guest;
+        const uuid = uuidv4();
+
+        const query = 'INSERT INTO guest (uuid, fullName, gender) VALUES (?, ?, ?)';
+        db.run(query, [uuid, fullName, gender], function (err) {
+            if (err) {
+                callback(err);
+            } else {
+                callback(null, { uuid, fullName, gender });
+            }
+        });
+    }
+
     /**
      * Find a guest by UUID
      *
@@ -27,9 +50,52 @@ class GuestSQL {
      *
      * @param {Function} callback - Callback function(error, rows)
      */
-    static findAll(callback) {
+    static getAll(callback) {
         const query = 'SELECT * FROM guest ORDER BY fullName';
         db.all(query, [], callback);
+    }
+
+    /**
+     * Update guest information
+     *
+     * @param {string} uuid - Guest UUID
+     * @param {Object} updates - The data to update
+     * @param {string} updates.fullName - Guest's full name
+     * @param {string} updates.gender - Guest's gender
+     * @param {Function} callback - Callback function(error, result)
+     */
+    static update(uuid, updates, callback) {
+        const { fullName, gender } = updates;
+        const query = 'UPDATE guest SET fullName = ?, gender = ? WHERE uuid = ?';
+
+        db.run(query, [fullName, gender, uuid], function (err) {
+            if (err) {
+                callback(err);
+            } else {
+                if (this.changes > 0) {
+                    callback(null, { uuid, fullName, gender });
+                } else {
+                    callback(null, null);
+                }
+            }
+        });
+    }
+
+    /**
+     * Delete a guest
+     *
+     * @param {string} uuid - Guest UUID
+     * @param {Function} callback - Callback function(error, result)
+     */
+    static delete(uuid, callback) {
+        const query = 'DELETE FROM guest WHERE uuid = ?';
+        db.run(query, [uuid], function (err) {
+            if (err) {
+                callback(err);
+            } else {
+                callback(null, { deleted: this.changes > 0 });
+            }
+        });
     }
 
     /**

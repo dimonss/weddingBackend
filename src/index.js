@@ -72,7 +72,7 @@ const setupRoutes = () => {
 
     // Get all guests (protected with basic auth)
     app.get('/guests', basicAuth, (req, res) => {
-        GuestSQL.findAll((error, guests) => {
+        GuestSQL.getAll((error, guests) => {
             if (error) {
                 console.error('Error fetching guests:', error);
                 res.json(commonDto(STATUS.ERROR, 'Failed to fetch guests'));
@@ -93,6 +93,60 @@ const setupRoutes = () => {
             if (item) {
                 res.json(commonDto(STATUS.OK, 'success', item));
             } else res.json(commonDto(STATUS.NOT_FOUND, 'user not found'));
+        });
+    });
+
+    // Create new guest (protected with basic auth)
+    app.post('/guest', basicAuth, (req, res) => {
+        const { fullName, gender } = req.body;
+        console.log(req.body);
+        if (!fullName || !gender) {
+            return res.json(commonDto(STATUS.ERROR, 'fullName and gender are required'));
+        }
+        GuestSQL.create({ fullName, gender }, (error, guest) => {
+            if (error) {
+                console.error('Error creating guest:', error);
+                res.json(commonDto(STATUS.ERROR, 'Failed to create guest'));
+                return;
+            }
+            res.json(commonDto(STATUS.OK, 'Guest created successfully', guest));
+        });
+    });
+
+    // Update guest (protected with basic auth)
+    app.put('/guest/:uuid', basicAuth, (req, res) => {
+        const uuid = req.params.uuid;
+        console.log(req);
+        const { fullName, gender } = req.body;
+        if (!fullName || !gender) {
+            return res.json(commonDto(STATUS.ERROR, 'fullName and gender are required'));
+        }
+        GuestSQL.update(uuid, { fullName, gender }, (error, guest) => {
+            if (error) {
+                console.error('Error updating guest:', error);
+                res.json(commonDto(STATUS.ERROR, 'Failed to update guest'));
+                return;
+            }
+            if (!guest) {
+                return res.json(commonDto(STATUS.NOT_FOUND, 'Guest not found'));
+            }
+            res.json(commonDto(STATUS.OK, 'Guest updated successfully', guest));
+        });
+    });
+
+    // Delete guest (protected with basic auth)
+    app.delete('/guest/:uuid', basicAuth, (req, res) => {
+        const uuid = req.params.uuid;
+        GuestSQL.delete(uuid, (error, result) => {
+            if (error) {
+                console.error('Error deleting guest:', error);
+                res.json(commonDto(STATUS.ERROR, 'Failed to delete guest'));
+                return;
+            }
+            if (!result.deleted) {
+                return res.json(commonDto(STATUS.NOT_FOUND, 'Guest not found'));
+            }
+            res.json(commonDto(STATUS.OK, 'Guest deleted successfully'));
         });
     });
 
@@ -121,13 +175,9 @@ const setupRoutes = () => {
             res.json(commonDto(STATUS.OK, 'success', person));
         });
     });
-    // Handle 404 errors
-    app.use((req, res) => {
-        res.status(404).json(commonDto(STATUS.NOT_FOUND, `Cannot ${req.method} ${req.path}`));
-    });
 
     // Error handler
-    app.use((err, req, res, next) => {
+    app.use((err, req, res) => {
         console.error('Unhandled error:', err);
         res.status(500).json(commonDto(STATUS.ERROR, 'Internal server error'));
     });
