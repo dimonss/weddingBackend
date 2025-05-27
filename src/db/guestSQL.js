@@ -65,10 +65,9 @@ class GuestSQL {
      * @param {Function} callback - Callback function(error, result)
      */
     static update(uuid, updates, callback) {
-        const { fullName, gender } = updates;
-        const query = 'UPDATE guest SET fullName = ?, gender = ? WHERE uuid = ?';
-
-        db.run(query, [fullName, gender, uuid], function (err) {
+        const { fullName, gender, respStatus } = updates;
+        const query = 'UPDATE guest SET fullName = ?, gender = ?, respStatus = ? WHERE uuid = ?';
+        db.run(query, [fullName, gender, respStatus, uuid], function (err) {
             if (err) {
                 callback(err);
             } else {
