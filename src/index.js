@@ -48,9 +48,18 @@ const setupMiddleware = () => {
 
     // CORS configuration
     // app.use((req, res, next) => {
-    //     res.append('Access-Control-Allow-Origin', ['*']);
-    //     res.append('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,PATCH');
-    //     res.append('Access-Control-Allow-Headers', 'Content-Type,Auth,auth');
+    //     res.header('Access-Control-Allow-Origin', '*');
+    //     res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
+    //     res.header(
+    //         'Access-Control-Allow-Headers',
+    //         'Origin, X-Requested-With, Content-Type, Accept, Authorization, Auth, auth',
+    //     );
+    //
+    //     // Handle preflight requests
+    //     if (req.method === 'OPTIONS') {
+    //         return res.status(200).end();
+    //     }
+    //
     //     next();
     // });
 
@@ -117,11 +126,11 @@ const setupRoutes = () => {
     app.put('/guest/:uuid', basicAuth, (req, res) => {
         const uuid = req.params.uuid;
         console.log(req);
-        const { fullName, gender } = req.body;
+        const { fullName, gender, respStatus } = req.body;
         if (!fullName || !gender) {
-            return res.json(commonDto(STATUS.ERROR, 'fullName and gender are required'));
+            return res.json(commonDto(STATUS.ERROR, 'fullName or gender or respStatus are required'));
         }
-        GuestSQL.update(uuid, { fullName, gender }, (error, guest) => {
+        GuestSQL.update(uuid, { fullName, gender, respStatus }, (error, guest) => {
             if (error) {
                 console.error('Error updating guest:', error);
                 res.json(commonDto(STATUS.ERROR, 'Failed to update guest'));
