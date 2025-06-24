@@ -7,7 +7,20 @@ export const GENDER = {
 };
 
 const SQLQueries = {
-    // CATEGORY
+    // USER
+    user: `
+    CREATE TABLE IF NOT EXISTS user
+    (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    uuid TEXT NOT NULL UNIQUE,
+    name TEXT NOT NULL,
+    phone TEXT NOT NULL UNIQUE,
+    username TEXT NOT NULL UNIQUE,
+    password TEXT NOT NULL
+    )
+    `,
+    
+    // GUEST
     guest: `
     CREATE TABLE IF NOT EXISTS guest
     (
@@ -16,7 +29,9 @@ const SQLQueries = {
     fullName TEXT NOT NULL UNIQUE,
     respDate TEXT,
     respStatus INTEGER DEFAULT NULL,
-    gender TEXT NOT NULL DEFAULT ${GENDER.MALE}
+    gender TEXT NOT NULL DEFAULT '${GENDER.MALE}',
+    user_id INTEGER,
+    FOREIGN KEY (user_id) REFERENCES user(id)
     )
     `,
 };
