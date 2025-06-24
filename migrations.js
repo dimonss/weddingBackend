@@ -9,28 +9,30 @@ export const GENDER = {
 const SQLQueries = {
     // USER
     user: `
-    CREATE TABLE IF NOT EXISTS user
-    (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    phone TEXT NOT NULL UNIQUE,
-    username TEXT NOT NULL UNIQUE,
-    auth TEXT NOT NULL
-    )
+        CREATE TABLE IF NOT EXISTS user
+        (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            phone TEXT NOT NULL UNIQUE,
+            username TEXT NOT NULL UNIQUE,
+            auth TEXT NOT NULL
+        )
     `,
     
     // GUEST
     guest: `
-    CREATE TABLE IF NOT EXISTS guest
-    (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    uuid TEXT NOT NULL UNIQUE,
-    fullName TEXT NOT NULL UNIQUE,
-    respDate TEXT,
-    respStatus INTEGER DEFAULT NULL,
-    gender TEXT NOT NULL DEFAULT '${GENDER.MALE}',
-    user_id INTEGER,
-    FOREIGN KEY (user_id) REFERENCES user(id)
-    )
+        CREATE TABLE IF NOT EXISTS guest
+        (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            uuid TEXT NOT NULL UNIQUE,
+            fullName TEXT NOT NULL UNIQUE,
+            respDate TEXT,
+            respStatus INTEGER DEFAULT NULL,
+            gender TEXT NOT NULL DEFAULT ${GENDER.MALE}
+        )
+    `,
+    guest_v1: `
+    ALTER TABLE guest
+    ADD user_id INTEGER;
     `,
 };
 
