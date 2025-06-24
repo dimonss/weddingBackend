@@ -12,11 +12,9 @@ const SQLQueries = {
     CREATE TABLE IF NOT EXISTS user
     (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    uuid TEXT NOT NULL UNIQUE,
-    name TEXT NOT NULL,
     phone TEXT NOT NULL UNIQUE,
     username TEXT NOT NULL UNIQUE,
-    password TEXT NOT NULL
+    auth TEXT NOT NULL
     )
     `,
     
