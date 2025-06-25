@@ -49,9 +49,10 @@ class GuestSQL {
      * Get all guests
      *
      * @param {Function} callback - Callback function(error, rows)
+     * @param userId
      */
-    static getAll(callback) {
-        const query = 'SELECT * FROM guest ORDER BY fullName';
+    static getAll(callback, userId) {
+        const query = `SELECT * FROM guest WHERE user_id = ${userId} ORDER BY fullName`;
         db.all(query, [], callback);
     }
 

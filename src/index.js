@@ -1,5 +1,6 @@
 import express from 'express';
 import GuestSQL from './db/guestSQL.js';
+import UserSQL from './db/userSQL.js';
 import { commonDto } from './DTO/common.js';
 import { STATUS } from './constants.js';
 import { getCurrentDate } from './utils/commonUtils.js';
@@ -9,8 +10,6 @@ dotenv.config();
 
 const HOSTNAME = process.env.HOSTNAME || '0.0.0.0';
 const PORT = process.env.PORT || 7000;
-const ADMIN_USERNAME = process.env.ADMIN_USERNAME || 'defaultUsername';
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'defaultPass';
 const app = express();
 
 /**
@@ -32,11 +31,22 @@ const basicAuth = (req, res, next) => {
     // Decode credentials
     const base64Credentials = authHeader.split(' ')[1];
     const credentials = Buffer.from(base64Credentials, 'base64').toString('utf8');
-    const [username, password] = credentials.split(':');
 
-    // Validate credentials
-    if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) next();
-    else return res.status(401).json(commonDto(STATUS.ERROR, 'Invalid credentials'));
+    // Validate credentials against database
+    UserSQL.validateCredentials(credentials, (error, user) => {
+        if (error) {
+            console.error('Database error during authentication:', error);
+            return res.status(500).json(commonDto(STATUS.ERROR, 'Authentication service error'));
+        }
+        
+        if (!user) {
+            return res.status(401).json(commonDto(STATUS.ERROR, 'Invalid credentials'));
+        }
+        
+        // Add user info to request for potential use in routes
+        req.user = user;
+        next();
+    });
 };
 
 /**
@@ -88,7 +98,7 @@ const setupRoutes = () => {
                 return;
             }
             res.json(commonDto(STATUS.OK, 'success', guests));
-        });
+        }, req?.user?.id);
     });
 
     // Get a guest by UUID
