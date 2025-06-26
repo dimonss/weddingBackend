@@ -1,9 +1,11 @@
 import express from 'express';
 import GuestSQL from './db/guestSQL.js';
-import UserSQL from './db/userSQL.js';
 import { commonDto } from './DTO/common.js';
 import { STATUS } from './constants.js';
 import { getCurrentDate } from './utils/commonUtils.js';
+import checkGuestAccess from './middleware/checkGuestAccess.js';
+import basicAuth from './middleware/basicAuth.js';
+// import cors from './middleware/cors.js';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -13,75 +15,6 @@ const PORT = process.env.PORT || 7000;
 const app = express();
 
 /**
- * Basic authentication middleware
- *
- * @param {Object} req - Express request object
- * @param {Object} res - Express response object
- * @param {Function} next - Express next function
- */
-const basicAuth = (req, res, next) => {
-    // Check for authorization header
-    const authHeader = req.headers.authorization;
-
-    if (!authHeader || !authHeader.startsWith('Basic ')) {
-        res.set('WWW-Authenticate', 'Basic realm="Wedding Admin"');
-        return res.status(401).json(commonDto(STATUS.ERROR, 'Authentication required'));
-    }
-
-    // Decode credentials
-    const base64Credentials = authHeader.split(' ')[1];
-    const credentials = Buffer.from(base64Credentials, 'base64').toString('utf8');
-
-    // Validate credentials against database
-    UserSQL.validateCredentials(credentials, (error, user) => {
-        if (error) {
-            console.error('Database error during authentication:', error);
-            return res.status(500).json(commonDto(STATUS.ERROR, 'Authentication service error'));
-        }
-
-        if (!user) {
-            return res.status(401).json(commonDto(STATUS.ERROR, 'Invalid credentials'));
-        }
-
-        // Add user info to request for potential use in routes
-        req.user = user;
-        next();
-    });
-};
-
-/**
- * Middleware to check if user has access to a specific guest
- */
-const checkGuestAccess = (req, res, next) => {
-    const uuid = req.params.uuid;
-    const userId = req.user?.id;
-
-    if (!userId) {
-        return res.status(401).json(commonDto(STATUS.ERROR, 'User not authenticated'));
-    }
-
-    GuestSQL.find(uuid, (error, guest) => {
-        if (error) {
-            console.error('Error finding guest:', error);
-            return res.status(500).json(commonDto(STATUS.ERROR, 'Database error'));
-        }
-
-        if (!guest) {
-            return res.status(404).json(commonDto(STATUS.NOT_FOUND, 'Guest not found'));
-        }
-
-        // Check if the guest belongs to the authenticated user
-        if (guest.user_id !== userId) {
-            return res.status(401).json(commonDto(STATUS.ERROR, 'Invalid credentials'));
-        }
-
-        // Add guest to request for potential use in routes
-        req.guest = guest;
-        next();
-    });
-};
-
-/**
  * Setup middleware functions
  */
 const setupMiddleware = () => {
@@ -89,27 +22,7 @@ const setupMiddleware = () => {
     app.use(express.json());
 
     // CORS configuration
-    // app.use((req, res, next) => {
-    //     res.header('Access-Control-Allow-Origin', '*');
-    //     res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
-    //     res.header(
-    //         'Access-Control-Allow-Headers',
-    //         'Origin, X-Requested-With, Content-Type, Accept, Authorization, Auth, auth',
-    //     );
-    //
-    //     // Handle preflight requests
-    //     if (req.method === 'OPTIONS') {
-    //         return res.status(200).end();
-    //     }
-    //
-    //     next();
-    // });
-
-    // Request logging
-    app.use((req, res, next) => {
-        console.log(`${new Date().toISOString()} ${req.method} ${req.path}`);
-        next();
-    });
+    // app.use(cors);
 };
 
 /**
