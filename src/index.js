@@ -5,6 +5,7 @@ import { STATUS } from './constants.js';
 import { getCurrentDate } from './utils/commonUtils.js';
 import checkGuestAccess from './middleware/checkGuestAccess.js';
 import basicAuth from './middleware/basicAuth.js';
+import requestLogger from './middleware/requestLogger.js';
 // import cors from './middleware/cors.js';
 import dotenv from 'dotenv';
 
@@ -23,6 +24,9 @@ const setupMiddleware = () => {
 
     // CORS configuration
     // app.use(cors);
+
+    // Request logging
+    app.use(requestLogger);
 };
 
 /**
