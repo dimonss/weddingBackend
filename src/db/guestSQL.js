@@ -19,17 +19,18 @@ class GuestSQL {
      * @param {string} guest.fullName - Guest's full name
      * @param {string} guest.gender - Guest's gender
      * @param {Function} callback - Callback function(error, result)
+     * @param {number} userId - ID of the user creating the guest
      */
-    static create(guest, callback) {
+    static create(guest, callback, userId) {
         const { fullName, gender } = guest;
         const uuid = uuidv4();
 
-        const query = 'INSERT INTO guest (uuid, fullName, gender) VALUES (?, ?, ?)';
-        db.run(query, [uuid, fullName, gender], function (err) {
+        const query = 'INSERT INTO guest (uuid, fullName, gender, user_id) VALUES (?, ?, ?, ?)';
+        db.run(query, [uuid, fullName, gender, userId], function (err) {
             if (err) {
                 callback(err);
             } else {
-                callback(null, { uuid, fullName, gender });
+                callback(null, { uuid, fullName, gender, user_id: userId });
             }
         });
     }
@@ -46,14 +47,19 @@ class GuestSQL {
     }
 
     /**
-     * Get all guests
+     * Get all guests for a specific user
      *
      * @param {Function} callback - Callback function(error, rows)
-     * @param userId
+     * @param {number} userId - ID of the user
      */
-    static getAll(callback, userId) {
-        const query = `SELECT * FROM guest WHERE user_id = ${userId} ORDER BY fullName`;
-        db.all(query, [], callback);
+    static findAll(callback, userId) {
+        if (userId) {
+            const query = 'SELECT * FROM guest WHERE user_id = ? ORDER BY fullName';
+            db.all(query, [userId], callback);
+        } else {
+            const query = 'SELECT * FROM guest ORDER BY fullName';
+            db.all(query, [], callback);
+        }
     }
 
     /**

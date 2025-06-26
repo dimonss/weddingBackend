@@ -38,13 +38,45 @@ const basicAuth = (req, res, next) => {
             console.error('Database error during authentication:', error);
             return res.status(500).json(commonDto(STATUS.ERROR, 'Authentication service error'));
         }
-        
+
         if (!user) {
             return res.status(401).json(commonDto(STATUS.ERROR, 'Invalid credentials'));
         }
-        
+
         // Add user info to request for potential use in routes
         req.user = user;
+        next();
+    });
+};
+
+/**
+ * Middleware to check if user has access to a specific guest
+ */
+const checkGuestAccess = (req, res, next) => {
+    const uuid = req.params.uuid;
+    const userId = req.user?.id;
+
+    if (!userId) {
+        return res.status(401).json(commonDto(STATUS.ERROR, 'User not authenticated'));
+    }
+
+    GuestSQL.find(uuid, (error, guest) => {
+        if (error) {
+            console.error('Error finding guest:', error);
+            return res.status(500).json(commonDto(STATUS.ERROR, 'Database error'));
+        }
+
+        if (!guest) {
+            return res.status(404).json(commonDto(STATUS.NOT_FOUND, 'Guest not found'));
+        }
+
+        // Check if the guest belongs to the authenticated user
+        if (guest.user_id !== userId) {
+            return res.status(401).json(commonDto(STATUS.ERROR, 'Invalid credentials'));
+        }
+
+        // Add guest to request for potential use in routes
+        req.guest = guest;
         next();
     });
 };
@@ -89,9 +121,9 @@ const setupRoutes = () => {
         res.json(commonDto(STATUS.OK, 'success', { status: 'UP' }));
     });
 
-    // Get all guests (protected with basic auth)
+    // Get all guests of user (protected with basic auth)
     app.get('/guests', basicAuth, (req, res) => {
-        GuestSQL.getAll((error, guests) => {
+        GuestSQL.findAll((error, guests) => {
             if (error) {
                 console.error('Error fetching guests:', error);
                 res.json(commonDto(STATUS.ERROR, 'Failed to fetch guests'));
@@ -118,24 +150,26 @@ const setupRoutes = () => {
     // Create new guest (protected with basic auth)
     app.post('/guest', basicAuth, (req, res) => {
         const { fullName, gender } = req.body;
-        console.log(req.body);
         if (!fullName || !gender) {
             return res.json(commonDto(STATUS.ERROR, 'fullName and gender are required'));
         }
-        GuestSQL.create({ fullName, gender }, (error, guest) => {
-            if (error) {
-                console.error('Error creating guest:', error);
-                res.json(commonDto(STATUS.ERROR, 'Failed to create guest'));
-                return;
-            }
-            res.json(commonDto(STATUS.OK, 'Guest created successfully', guest));
-        });
+        GuestSQL.create(
+            { fullName, gender },
+            (error, guest) => {
+                if (error) {
+                    console.error('Error creating guest:', error);
+                    res.json(commonDto(STATUS.ERROR, 'Failed to create guest'));
+                    return;
+                }
+                res.json(commonDto(STATUS.OK, 'Guest created successfully', guest));
+            },
+            req.user.id,
+        );
     });
 
-    // Update guest (protected with basic auth)
-    app.put('/guest/:uuid', basicAuth, (req, res) => {
+    // Update guest (protected with basic auth and guest access check)
+    app.put('/guest/:uuid', basicAuth, checkGuestAccess, (req, res) => {
         const uuid = req.params.uuid;
-        console.log(req);
         const { fullName, gender, respStatus } = req.body;
         if (!fullName || !gender) {
             return res.json(commonDto(STATUS.ERROR, 'fullName or gender or respStatus are required'));
@@ -153,8 +187,8 @@ const setupRoutes = () => {
         });
     });
 
-    // Delete guest (protected with basic auth)
-    app.delete('/guest/:uuid', basicAuth, (req, res) => {
+    // Delete guest (protected with basic auth and guest access check)
+    app.delete('/guest/:uuid', basicAuth, checkGuestAccess, (req, res) => {
         const uuid = req.params.uuid;
         GuestSQL.delete(uuid, (error, result) => {
             if (error) {
