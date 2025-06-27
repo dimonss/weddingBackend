@@ -1,5 +1,6 @@
 import express from 'express';
 import GuestSQL from './db/guestSQL.js';
+import UserSQL from './db/userSQL.js';
 import { commonDto } from './DTO/common.js';
 import { STATUS } from './constants.js';
 import { getCurrentDate } from './utils/commonUtils.js';
@@ -36,6 +37,51 @@ const setupRoutes = () => {
     // Health check route
     app.get('/health', (req, res) => {
         res.json(commonDto(STATUS.OK, 'success', { status: 'UP' }));
+    });
+
+    // Get user couple information (protected with basic auth)
+    app.get('/user', basicAuth, (req, res) => {
+        const userId = req?.user?.id;
+        if (!userId) {
+            return res.json(commonDto(STATUS.ERROR, 'User not authenticated'));
+        }
+
+        UserSQL.getUserInfo(userId, (error, userInfo) => {
+            if (error) {
+                console.error('Error fetching couple info:', error);
+                res.json(commonDto(STATUS.ERROR, 'Failed to fetch couple information'));
+                return;
+            }
+            if (!userInfo) {
+                return res.json(commonDto(STATUS.NOT_FOUND, 'User information not found'));
+            }
+            res.json(commonDto(STATUS.OK, 'Couple information retrieved successfully', userInfo));
+        });
+    });
+
+    // Update user couple information (protected with basic auth)
+    app.put('/user/couple', basicAuth, (req, res) => {
+        const userId = req?.user?.id;
+        if (!userId) {
+            return res.json(commonDto(STATUS.ERROR, 'User not authenticated'));
+        }
+
+        const { husbands_name, wifes_name } = req.body;
+        if (!husbands_name || !wifes_name) {
+            return res.json(commonDto(STATUS.ERROR, 'husbands_name and wifes_name are required'));
+        }
+
+        UserSQL.updateCoupleInfo(userId, { husbands_name, wifes_name }, (error, result) => {
+            if (error) {
+                console.error('Error updating couple info:', error);
+                res.json(commonDto(STATUS.ERROR, 'Failed to update couple information'));
+                return;
+            }
+            if (!result) {
+                return res.json(commonDto(STATUS.NOT_FOUND, 'User not found'));
+            }
+            res.json(commonDto(STATUS.OK, 'Couple information updated successfully', result));
+        });
     });
 
     // Get all guests of user (protected with basic auth)
