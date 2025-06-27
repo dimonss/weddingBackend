@@ -17,7 +17,7 @@ const SQLQueries = {
             auth TEXT NOT NULL
         )
     `,
-    
+
     // GUEST
     guest: `
         CREATE TABLE IF NOT EXISTS guest
@@ -33,6 +33,14 @@ const SQLQueries = {
     guest_v1: `
     ALTER TABLE guest
     ADD user_id INTEGER;
+    `,
+    guest_v2: `
+    ALTER TABLE user
+    ADD husbands_name TEXT DEFAULT '';
+    `,
+    guest_v3: `
+    ALTER TABLE user
+    ADD wifes_name TEXT DEFAULT '';
     `,
 };
 
