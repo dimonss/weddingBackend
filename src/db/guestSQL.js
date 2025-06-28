@@ -36,6 +36,22 @@ class GuestSQL {
     }
 
     /**
+     * Find a guest by UUID with couple information
+     *
+     * @param {string} uuid - The unique identifier of the guest
+     * @param {Function} callback - Callback function(error, row)
+     */
+    static findWithCoupleInfo(uuid, callback) {
+        const query = `
+            SELECT g.*, u.husbands_name, u.wifes_name 
+            FROM guest g 
+            LEFT JOIN user u ON g.user_id = u.id 
+            WHERE g.uuid = ?
+        `;
+        db.get(query, [uuid], callback);
+    }
+
+    /**
      * Find a guest by UUID
      *
      * @param {string} uuid - The unique identifier of the guest

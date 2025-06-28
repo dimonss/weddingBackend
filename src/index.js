@@ -99,7 +99,7 @@ const setupRoutes = () => {
     // Get a guest by UUID
     app.get('/guest/:uuid', (req, res) => {
         const uuid = req?.params?.uuid;
-        GuestSQL.find(uuid, (error, item) => {
+        GuestSQL.findWithCoupleInfo(uuid, (error, item) => {
             if (error) {
                 res.json(commonDto(STATUS.ERROR, 'error'));
                 return;
