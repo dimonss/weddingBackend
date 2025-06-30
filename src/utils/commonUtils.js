@@ -18,3 +18,37 @@ export const getCurrentDate = () => {
 
     return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 };
+
+/**
+ * Convert escaped newlines back to actual newlines
+ * This fixes the issue where SQLite stores "\\n" instead of "\n"
+ *
+ * @param {string} text - Text that may contain escaped newlines
+ * @returns {string} Text with proper newlines
+ */
+export const fixNewlines = (text) => {
+    if (!text || typeof text !== 'string') {
+        return text;
+    }
+    return text.replace(/\\n/g, '\n');
+};
+
+/**
+ * Process object and fix newlines in all string fields
+ *
+ * @param {Object} obj - Object that may contain escaped newlines
+ * @returns {Object} Object with proper newlines
+ */
+export const fixNewlinesInObject = (obj) => {
+    if (!obj || typeof obj !== 'object') {
+        return obj;
+    }
+    
+    const result = { ...obj };
+    for (const [key, value] of Object.entries(result)) {
+        if (typeof value === 'string') {
+            result[key] = fixNewlines(value);
+        }
+    }
+    return result;
+};

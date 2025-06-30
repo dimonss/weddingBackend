@@ -60,7 +60,7 @@ class UserSQL {
      * @param {Function} callback - Callback function(error, user)
      */
     static getUserInfo(userId, callback) {
-        const query = 'SELECT id, phone, username, husbands_name, wifes_name FROM user WHERE id = ?';
+        const query = 'SELECT id, phone, username, husbands_name, wifes_name, date, time, address FROM user WHERE id = ?';
         db.get(query, [userId], callback);
     }
 
@@ -83,6 +83,33 @@ class UserSQL {
             } else {
                 if (this.changes > 0) {
                     callback(null, { id: userId, husbands_name, wifes_name });
+                } else {
+                    callback(null, null);
+                }
+            }
+        });
+    }
+
+    /**
+     * Update user wedding details (date, time, address)
+     *
+     * @param {number} userId - The user ID
+     * @param {Object} weddingInfo - The wedding information to update
+     * @param {string} weddingInfo.date - Wedding date
+     * @param {string} weddingInfo.time - Wedding time
+     * @param {string} weddingInfo.address - Wedding address
+     * @param {Function} callback - Callback function(error, result)
+     */
+    static updateWeddingInfo(userId, weddingInfo, callback) {
+        const { date, time, address } = weddingInfo;
+        const query = 'UPDATE user SET date = ?, time = ?, address = ? WHERE id = ?';
+
+        db.run(query, [date, time, address, userId], function (err) {
+            if (err) {
+                callback(err);
+            } else {
+                if (this.changes > 0) {
+                    callback(null, { id: userId, date, time, address });
                 } else {
                     callback(null, null);
                 }

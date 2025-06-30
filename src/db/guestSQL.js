@@ -1,5 +1,6 @@
 import sqlite3 from 'sqlite3';
 import { v4 as uuidv4 } from 'uuid';
+import { fixNewlinesInObject } from '../utils/commonUtils.js';
 
 // Enable verbose mode for detailed error messages during development
 sqlite3.verbose();
@@ -48,7 +49,15 @@ class GuestSQL {
             LEFT JOIN user u ON g.user_id = u.id 
             WHERE g.uuid = ?
         `;
-        db.get(query, [uuid], callback);
+        db.get(query, [uuid], (err, row) => {
+            if (err) {
+                callback(err);
+            } else {
+                // Fix newlines in the result
+                const fixedRow = fixNewlinesInObject(row);
+                callback(null, fixedRow);
+            }
+        });
     }
 
     /**
