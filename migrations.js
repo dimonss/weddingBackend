@@ -18,6 +18,27 @@ const SQLQueries = {
         )
     `,
 
+    user_v1: `
+    ALTER TABLE user
+    ADD husbands_name TEXT DEFAULT '';
+    `,
+    user_v2: `
+    ALTER TABLE user
+    ADD wifes_name TEXT DEFAULT '';
+    `,
+    user_v3: `
+    ALTER TABLE user
+    ADD address TEXT DEFAULT '';
+    `,
+    user_v4: `
+    ALTER TABLE user
+    ADD date TEXT DEFAULT '';
+    `,
+    user_v5: `
+    ALTER TABLE user
+    ADD time TEXT DEFAULT '';
+    `,
+
     // GUEST
     guest: `
         CREATE TABLE IF NOT EXISTS guest
@@ -30,18 +51,11 @@ const SQLQueries = {
             gender TEXT NOT NULL DEFAULT ${GENDER.MALE}
         )
     `,
-    guest_v1: `
-    ALTER TABLE guest
-    ADD user_id INTEGER;
-    `,
-    guest_v2: `
-    ALTER TABLE user
-    ADD husbands_name TEXT DEFAULT '';
-    `,
-    guest_v3: `
-    ALTER TABLE user
-    ADD wifes_name TEXT DEFAULT '';
-    `,
+    // guest_v1: `
+    // ALTER TABLE guest
+    // ADD user_id INTEGER;
+    // `,
+
 };
 
 const db = new sqlite3.Database(DB_NAME);
