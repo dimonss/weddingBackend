@@ -43,7 +43,7 @@ class GuestSQL {
      */
     static findWithCoupleInfo(uuid, callback) {
         const query = `
-            SELECT g.*, u.husbands_name, u.wifes_name 
+            SELECT g.*, u.husbands_name, u.wifes_name, u.date, u.time, u.address 
             FROM guest g 
             LEFT JOIN user u ON g.user_id = u.id 
             WHERE g.uuid = ?

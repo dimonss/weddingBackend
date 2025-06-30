@@ -51,10 +51,10 @@ const SQLQueries = {
             gender TEXT NOT NULL DEFAULT ${GENDER.MALE}
         )
     `,
-    // guest_v1: `
-    // ALTER TABLE guest
-    // ADD user_id INTEGER;
-    // `,
+    guest_v1: `
+    ALTER TABLE guest
+    ADD user_id INTEGER;
+    `,
 
 };
 
