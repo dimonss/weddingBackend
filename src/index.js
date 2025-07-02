@@ -67,11 +67,13 @@ const setupRoutes = () => {
         }
 
         const { husbands_name, wifes_name } = req.body;
-        if (!husbands_name || !wifes_name) {
-            return res.json(commonDto(STATUS.ERROR, 'husbands_name and wifes_name are required'));
-        }
+        // Allow empty values for free text input
+        const coupleData = {
+            husbands_name: husbands_name || '',
+            wifes_name: wifes_name || ''
+        };
 
-        UserSQL.updateCoupleInfo(userId, { husbands_name, wifes_name }, (error, result) => {
+        UserSQL.updateCoupleInfo(userId, coupleData, (error, result) => {
             if (error) {
                 console.error('Error updating couple info:', error);
                 res.json(commonDto(STATUS.ERROR, 'Failed to update couple information'));
@@ -81,6 +83,34 @@ const setupRoutes = () => {
                 return res.json(commonDto(STATUS.NOT_FOUND, 'User not found'));
             }
             res.json(commonDto(STATUS.OK, 'Couple information updated successfully', result));
+        });
+    });
+
+    // Update user wedding information (protected with basic auth)
+    app.put('/user/wedding', basicAuth, (req, res) => {
+        const userId = req?.user?.id;
+        if (!userId) {
+            return res.json(commonDto(STATUS.ERROR, 'User not authenticated'));
+        }
+
+        const { date, time, address } = req.body;
+        // Allow empty values for free text input
+        const weddingData = {
+            date: date || '',
+            time: time || '',
+            address: address || ''
+        };
+
+        UserSQL.updateWeddingInfo(userId, weddingData, (error, result) => {
+            if (error) {
+                console.error('Error updating wedding info:', error);
+                res.json(commonDto(STATUS.ERROR, 'Failed to update wedding information'));
+                return;
+            }
+            if (!result) {
+                return res.json(commonDto(STATUS.NOT_FOUND, 'User not found'));
+            }
+            res.json(commonDto(STATUS.OK, 'Wedding information updated successfully', result));
         });
     });
 
