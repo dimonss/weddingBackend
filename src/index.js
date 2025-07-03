@@ -7,7 +7,8 @@ import { getCurrentDate } from './utils/commonUtils.js';
 import checkGuestAccess from './middleware/checkGuestAccess.js';
 import basicAuth from './middleware/basicAuth.js';
 import requestLogger from './middleware/requestLogger.js';
-// import cors from './middleware/cors.js';
+import cors from './middleware/cors.js';
+import { isDevelopment } from './config/database.js';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -22,12 +23,15 @@ const app = express();
 const setupMiddleware = () => {
     // Parse JSON request body
     app.use(express.json());
-
-    // CORS configuration
-    // app.use(cors);
-
     // Request logging
     app.use(requestLogger);
+    // CORS configuration - only in development
+    if (isDevelopment()) {
+        app.use(cors);
+        console.log('🌐 CORS enabled for development');
+    } else {
+        console.log('🔒 CORS disabled for production');
+    }
 };
 
 /**
