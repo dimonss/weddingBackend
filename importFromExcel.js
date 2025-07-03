@@ -1,6 +1,6 @@
 import sqlite3 from 'sqlite3';
 import xlsx from 'xlsx';
-import { DB_NAME } from './migrations.js';
+import { DB_NAME } from './initDB.js';
 
 const db = new sqlite3.Database(DB_NAME);
 

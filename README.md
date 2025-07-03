@@ -44,7 +44,7 @@ NODE_ENV=development
 
 ### 4. Run migrations to set up the database:
 ```sh
-node migrations.js
+node initDB.js
 ```
 
 ### 5. Start the server:
@@ -87,7 +87,7 @@ The server will start at `http://localhost:4000` (or the port specified in your 
 │   │   └── commonUtils.js # Common utilities
 │   │── constants.js       # Application constants
 │   └── index.js           # Application entry point
-│── migrations.js          # Database migrations
+│── initDB.js          # Database migrations
 │── .env                   # Environment variables
 │── package.json           # Project dependencies
 └── README.md             # Project documentation

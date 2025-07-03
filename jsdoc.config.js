@@ -12,7 +12,7 @@ module.exports = {
     source: {
         include: [
             'src/',
-            'migrations.js',
+            'initDB.js',
             'addMockUsers.js',
             'addMockGuests.js'
         ],

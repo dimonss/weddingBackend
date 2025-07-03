@@ -1,10 +1,11 @@
 import sqlite3 from 'sqlite3';
+import { getDatabaseFilename } from '../config/database.js';
 
 // Enable verbose mode for detailed error messages during development
 sqlite3.verbose();
 
 // Database configuration
-const DB_NAME = 'db.sqlite';
+const DB_NAME = getDatabaseFilename();
 const db = new sqlite3.Database(DB_NAME);
 
 /**

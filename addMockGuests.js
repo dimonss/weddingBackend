@@ -4,8 +4,8 @@ import { v4 as uuidv4 } from 'uuid';
 // Enable verbose mode for detailed error messages during development
 sqlite3.verbose();
 
-// Database configuration
-const DB_NAME = 'db.sqlite';
+// Database configuration - Always use test database for mock data
+const DB_NAME = 'test_db.sqlite';
 const db = new sqlite3.Database(DB_NAME);
 
 // Gender constants

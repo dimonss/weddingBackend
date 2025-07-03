@@ -8,17 +8,18 @@
     "esModuleInterop": true
   },
   "engines": {
-    "node": "20.*"
+    "node": "18.*"
   },
   "scripts": {
-    "start:dev": "nodemon src/index.js",
-    "start:prod": "pm2 start src/index.js --name WeddingBackend",
+    "start:dev": "NODE_ENV=development nodemon src/index.js",
+    "start:prod": "NODE_ENV=production pm2 start src/index.js --name WeddingBackend",
     "build": "rimraf ./build && npx tsc",
     "start": "npm run build && node build/main",
     "test": "node test_api_endpoints.js",
+    "init-db": "node initDB.js",
     "addMockUsers": "node addMockUsers.js",
     "addMockGuests": "node addMockGuests.js",
-    "migrations": "node migrations.js",
+    "setup-dev": "npm run init-db && npm run addMockUsers && npm run addMockGuests",
     "lint": "npx eslint ./src",
     "format": "npx eslint ./src --fix"
   },
