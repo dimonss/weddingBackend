@@ -13,7 +13,7 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const HOSTNAME = process.env.HOSTNAME || '0.0.0.0';
+const HOSTNAME = process.env.HOSTNAME || 'localhost';
 const PORT = process.env.PORT || 7000;
 const app = express();
 
@@ -130,6 +130,18 @@ const setupRoutes = () => {
         }, req?.user?.id);
     });
 
+    // Get all guests for public view (no auth required)
+    app.get('/guests/public', (req, res) => {
+        GuestSQL.findAll((error, guests) => {
+            if (error) {
+                console.error('Error fetching guests:', error);
+                res.json(commonDto(STATUS.ERROR, 'Failed to fetch guests'));
+                return;
+            }
+            res.json(commonDto(STATUS.OK, 'success', guests));
+        });
+    });
+
     // Get a guest by UUID
     app.get('/guest/:uuid', (req, res) => {
         const uuid = req?.params?.uuid;
@@ -227,7 +239,7 @@ const setupRoutes = () => {
     });
 
     // Error handler
-    app.use((err, req, res) => {
+    app.use((err, req, res, next) => {
         console.error('Unhandled error:', err);
         res.status(500).json(commonDto(STATUS.ERROR, 'Internal server error'));
     });
